@@ -30,6 +30,11 @@ def home():
 
 @app.post("/predict")
 def WeatherResult(payload: Input):
+    prev_cancelation = payload.no_of_previous_bookings_not_canceled + payload.no_of_previous_cancellations
+    result = 0
+    if prev_cancelation != 0:
+        result = payload.no_of_previous_bookings_not_canceled / prev_cancelation
+
     is_canceled = predict(
         payload.no_of_adults,
         payload.no_of_children,
@@ -41,8 +46,7 @@ def WeatherResult(payload: Input):
         payload.avg_price_per_room,
         payload.repeated_guest,
         payload.no_of_previous_cancellations,
-        payload.no_of_previous_bookings_not_canceled /
-        (payload.no_of_previous_bookings_not_canceled + payload.no_of_previous_cancellations)
+        result
     )
 
     return {"Result": int(str(is_canceled))}
